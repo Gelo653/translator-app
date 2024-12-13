@@ -34,6 +34,7 @@ export default function Translator() {
           source_text: text,
         }),
         mode: 'cors',
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -64,6 +65,7 @@ export default function Translator() {
           tgt_lang: tgtLang,
         }),
         mode: 'cors',
+        credentials: 'include',
       });
   
       if (response.ok) {
