@@ -33,6 +33,7 @@ export default function Translator() {
           target_language: to,
           source_text: text,
         }),
+        mode: 'cors',
       });
 
       if (response.ok) {
@@ -62,6 +63,7 @@ export default function Translator() {
           src_lang: srcLang,
           tgt_lang: tgtLang,
         }),
+        mode: 'cors',
       });
   
       if (response.ok) {
