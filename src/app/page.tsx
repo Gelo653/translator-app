@@ -6,16 +6,6 @@ import { Textarea } from "../components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
 import { ArrowRightLeft } from 'lucide-react'
 
-// Mock translation function (replace with actual API call in production)
-const mockTranslate = (text: string, from: string, to: string) => {
-  // This is a very basic mock. In reality, you'd call an API here.
-  if (from === 'spa_Latn' && to === 'agr_Latn') {
-    return `${text}`
-  } else if (from === 'agr_Latn' && to === 'spa_Latn') {
-    return `${text}`
-  }
-  return text
-}
 
 export default function Translator() {
   const [sourceText, setSourceText] = useState('')
@@ -26,8 +16,67 @@ export default function Translator() {
   const [isEditing, setIsEditing] = useState(false)
   const [editedTranslation, setEditedTranslation] = useState('')
 
-  const handleTranslate = () => {
-    const result = mockTranslate(sourceText, sourceLang, targetLang)
+  const API_URL = process.env.API_URL;
+
+  const APITranslate = async (text: string, from: string, to: string) => {
+    console.log(API_URL)
+    try {
+      const response = await fetch(`${API_URL}/translations/translate`,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source_language: from,
+          target_language: to,
+          source_text: text,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.translated_text);
+        return data.translated_text
+      } else {
+        throw new Error('Failed to fetch translation.');
+      }
+    } catch (error) {
+      console.error('Error during translation: ', error);
+      return 'Translation failed';
+    }
+  };
+
+  const APISave = async (sourceText: string, originalTranslation: string, editedTranslation: string, srcLang: string, tgtLang: string) => {
+    try {
+      const response = await fetch(`${API_URL}/translations/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          source_text: sourceText,
+          original_translation: originalTranslation,
+          edited_translation: editedTranslation,
+          src_lang: srcLang,
+          tgt_lang: tgtLang,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Translation saved:', data);
+        return data;  // You can return any data you need
+      } else {
+        throw new Error('Failed to save translation.');
+      }
+    } catch (error) {
+      console.error('Error saving translation: ', error);
+      return null;  // Return null in case of error
+    }
+  };
+  
+  const handleTranslate = async () => {
+    const result = await APITranslate(sourceText, sourceLang, targetLang)
     setTranslatedText(result)
     setOriginalTranslatedText(result)
     setEditedTranslation(result)
@@ -47,17 +96,27 @@ export default function Translator() {
     setIsEditing(false)
   }
 
-  const handleSave = () => {
-    // Here you would typically call an API to save the translation to the database
-    console.log('Saving to database:', {
-      sourceText,
-      originalTranslation: originalTranslatedText,
-      currentTranslation: translatedText,
-      editedTranslation: editedTranslation
-    })
-    // For now, we'll just log the data
-    alert('Translation saved to database')
-  }
+  const handleSave = async () => {
+    try {
+      // Call the APISave function to save the translation
+      const result = await APISave(
+        sourceText,
+        originalTranslatedText,
+        editedTranslation,
+        sourceLang,
+        targetLang
+      );
+  
+      if (result) {
+        alert('Translation saved to database');
+      } else {
+        alert('Failed to save translation');
+      }
+    } catch (error) {
+      console.error('Error saving translation: ', error);
+      alert('An error occurred while saving the translation.');
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
