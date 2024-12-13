@@ -16,12 +16,14 @@ export default function Translator() {
   const [isEditing, setIsEditing] = useState(false)
   const [editedTranslation, setEditedTranslation] = useState('')
 
-  const API_URL = process.env.API_URL;
+  const API_URL = "http://44.222.212.53:8000;
+  const TRANSLATE_URL= API_URL + "/translations/translate";
+  const SAVE_URL=API_URL+"/translations/save";
 
   const APITranslate = async (text: string, from: string, to: string) => {
     console.log(API_URL)
     try {
-      const response = await fetch(`${API_URL}/translations/translate`,{
+      const response = await fetch(TRANSLATE_URL,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +50,7 @@ export default function Translator() {
 
   const APISave = async (sourceText: string, originalTranslation: string, editedTranslation: string, srcLang: string, tgtLang: string) => {
     try {
-      const response = await fetch(`${API_URL}/translations/save`, {
+      const response = await fetch(SAVE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
