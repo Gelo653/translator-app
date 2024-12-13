@@ -16,7 +16,7 @@ export default function Translator() {
   const [isEditing, setIsEditing] = useState(false)
   const [editedTranslation, setEditedTranslation] = useState('')
 
-  const API_URL = "http://44.222.212.53:8000;
+  const API_URL = "http://44.222.212.53:8000";
   const TRANSLATE_URL= API_URL + "/translations/translate";
   const SAVE_URL=API_URL+"/translations/save";
 
